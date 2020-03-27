@@ -21,7 +21,21 @@ object RecFun extends RecFunInterface {
   /**
    * Exercise 2
    */
-  def balance(chars: List[Char]): Boolean = ???
+  def balance(chars: List[Char]): Boolean = {
+    @scala.annotation.tailrec
+    def balanceLoop(currentBalance: Int, chars: List[Char]): Boolean = {
+      if (currentBalance < 0) false // fail early if out of order
+      else if (chars.isEmpty) currentBalance == 0 // whole List processed
+      else {
+        val currentChar = chars.head
+        if (currentChar == '(') balanceLoop(currentBalance + 1, chars.tail)
+        else if (currentChar == ')') balanceLoop(currentBalance - 1, chars.tail)
+        else (balanceLoop(currentBalance, chars.tail))
+      }
+
+    }
+    balanceLoop(0, chars)
+  }
 
   /**
    * Exercise 3
