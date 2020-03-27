@@ -30,7 +30,7 @@ object RecFun extends RecFunInterface {
         val currentChar = chars.head
         if (currentChar == '(') balanceLoop(currentBalance + 1, chars.tail)
         else if (currentChar == ')') balanceLoop(currentBalance - 1, chars.tail)
-        else (balanceLoop(currentBalance, chars.tail))
+        else balanceLoop(currentBalance, chars.tail)
       }
 
     }
@@ -40,5 +40,15 @@ object RecFun extends RecFunInterface {
   /**
    * Exercise 3
    */
-  def countChange(money: Int, coins: List[Int]): Int = ???
+  def countChange(money: Int, coins: List[Int]): Int = {
+    def changeLoop(currentCount: Int, money: Int, coins: List[Int]): Int = {
+//      println(s"$currentCount -> $money -> $coins")
+      if (money == 0) currentCount + 1
+      else if (money < 0 || coins.isEmpty) currentCount
+      else changeLoop(currentCount, money - coins.head, coins) + changeLoop(currentCount, money, coins.tail)
+    }
+
+    if(money <= 0 || coins.isEmpty) 0 else
+    changeLoop(0, money, coins)
+  }
 }
