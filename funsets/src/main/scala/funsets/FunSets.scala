@@ -37,7 +37,7 @@ trait FunSets extends FunSetsInterface {
    * Returns the difference of the two given sets,
    * the set of all elements of `s` that are not in `t`.
    */
-  def diff(s: FunSet, t: FunSet): FunSet = (n: Int) => contains(s, n) && ! contains(t, n)
+  def diff(s: FunSet, t: FunSet): FunSet = (n: Int) => contains(s, n) && !contains(t, n)
 
   /**
    * Returns the subset of `s` for which `p` holds.
@@ -54,24 +54,27 @@ trait FunSets extends FunSetsInterface {
    * Returns whether all bounded integers within `s` satisfy `p`.
    */
   def forall(s: FunSet, p: Int => Boolean): Boolean = {
+    @scala.annotation.tailrec
     def iter(a: Int): Boolean = {
-      if (???) ???
-      else if (???) ???
-      else iter(???)
+      if (a == bound) contains(s, a) && p(a)
+      else if (contains(s, a)) p(a) && iter(a + 1)
+      else iter(a + 1)
     }
-    iter(???)
+
+    iter(-bound)
   }
 
   /**
    * Returns whether there exists a bounded integer within `s`
    * that satisfies `p`.
    */
-  def exists(s: FunSet, p: Int => Boolean): Boolean = ???
+    def exists(s: FunSet, p: Int => Boolean): Boolean = ! forall(s, _ => false)
 
   /**
    * Returns a set transformed by applying `f` to each element of `s`.
    */
-  def map(s: FunSet, f: Int => Int): FunSet = ???
+//  def map(s: FunSet, f: Int => Int): FunSet = ???
+  def map(s: FunSet, f: Int => Int): FunSet = (n: Int) => forall(s, (a: Int) => contains(s, f(a)))
 
   /**
    * Displays the contents of a set
