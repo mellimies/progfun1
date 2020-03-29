@@ -56,9 +56,15 @@ trait FunSets extends FunSetsInterface {
   def forall(s: FunSet, p: Int => Boolean): Boolean = {
     @scala.annotation.tailrec
     def iter(a: Int): Boolean = {
-      if (a == bound) contains(s, a) && p(a)
-      else if (contains(s, a)) p(a) && iter(a + 1)
-      else iter(a + 1)
+      if (a == bound) {
+        if (contains(s, a)) p(a) else true
+      }
+      else if (contains(s, a)) {
+        p(a) && iter(a + 1)
+      }
+      else {
+        iter(a + 1)
+      }
     }
 
     iter(-bound)
@@ -68,14 +74,16 @@ trait FunSets extends FunSetsInterface {
    * Returns whether there exists a bounded integer within `s`
    * that satisfies `p`.
    */
-    def exists(s: FunSet, p: Int => Boolean): Boolean = ! forall(s, _ => false)
+      def exists(s: FunSet, p: Int => Boolean): Boolean = !forall(s, !p(_))
 
   /**
    * Returns a set transformed by applying `f` to each element of `s`.
+   *
+   * "Your new set should return 'true' on input 'x' if and only if there exists an element 'a' in 's'
+   * such that 'f(a) == x'. It that more clear ?
    */
-//  def map(s: FunSet, f: Int => Int): FunSet = ???
-  def map(s: FunSet, f: Int => Int): FunSet = (n: Int) => forall(s, (a: Int) => contains(s, f(a)))
 
+  def map(s: FunSet, f: Int => Int): FunSet = (n: Int) => exists(s, x => f(x) == n)
   /**
    * Displays the contents of a set
    */

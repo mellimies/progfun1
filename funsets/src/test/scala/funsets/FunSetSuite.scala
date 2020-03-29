@@ -47,7 +47,8 @@ class FunSetSuite {
    * Once you finish your implementation of "singletonSet", remvoe the
    * @Ignore annotation.
    */
-  @Ignore("not ready yet") @Test def `singleton set one contains one`: Unit = {
+//  @Ignore("not ready yet") @Test def `singleton set one contains one`: Unit = {
+  @Test def `singleton set one contains one`: Unit = {
 
     /**
      * We create a new instance of the "TestSets" trait, this gives us access
@@ -68,6 +69,50 @@ class FunSetSuite {
       assert(contains(s, 1), "Union 1")
       assert(contains(s, 2), "Union 2")
       assert(!contains(s, 3), "Union 3")
+    }
+  }
+
+  /**
+   * My own tests: forall
+   */
+
+  @Test def `forall tests`: Unit = {
+    new TestSets {
+      val s = union(s1, s2)
+      assert(forall(s, (n: Int) => n == n), "forall identity")
+      assert(forall(s, (n: Int) => n < 5), "forall less than")
+      assert(!forall(union(s, singletonSet(-254)), (n: Int) => n > 0), "forall with negative")
+    }
+  }
+
+  /**
+   * My own tests: exists
+   */
+
+  @Test def `exists test`: Unit = {
+    new TestSets {
+      val s = union(s1, s2)
+      val ss = union(s, singletonSet(-254))
+      assert(exists(ss, (n: Int) => n > 0), "exists negative value, pass pos test")
+      assert(exists(ss, (n: Int) => n < 0), "exists with negative value, pass neg test")
+      assert(!exists(ss, (n: Int) => n < -500), "exists with negative value, fail neg test")
+      assert(!exists(ss, (n: Int) => n > 500), "exists with negative value, fail pos test")
+      assert(exists(ss, (n: Int) => n < -100), "exists with negative value, fail neg test")
+    }
+  }
+
+  /**
+   * My own tests: map
+   */
+
+  @Test def `map test`: Unit = {
+    new TestSets {
+      val s = union(s1, s2)
+      val ss = union(s, singletonSet(-254))
+
+      assert("{-253,2,3}" == FunSets.toString( map(ss, _ + 1)), "map add one")
+      assert("{0,1}" == FunSets.toString( map(ss, _ % 2)), "map modulo 2")
+      assert("{0}" == FunSets.toString( map(ss, (n: Int) => (n * 2) % 2)), "map doubled and modulo 2")
     }
   }
 
