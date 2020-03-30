@@ -1,14 +1,17 @@
 package objsets
 
-import TweetReader._
-
 /**
  * A class to represent tweets.
  */
 class Tweet(val user: String, val text: String, val retweets: Int) {
+  //  override def toString: String =
+  //    "User: " + user + "\n" +
+  //      "Text: " + text + " [" + retweets + "]"
+
   override def toString: String =
-    "User: " + user + "\n" +
+    "User: " + user + " -> " +
       "Text: " + text + " [" + retweets + "]"
+
 }
 
 /**
@@ -34,6 +37,8 @@ class Tweet(val user: String, val text: String, val retweets: Int) {
  */
 abstract class TweetSet extends TweetSetInterface {
 
+  def isEmpty: Boolean
+
   /**
    * This method takes a predicate and returns a subset of all the elements
    * in the original set for which the predicate is true.
@@ -42,7 +47,7 @@ abstract class TweetSet extends TweetSetInterface {
    * and be implemented in the subclasses?
    */
   //  def filter(p: Tweet => Boolean): TweetSet = ???
-  def filter(p: Tweet => Boolean): TweetSet =  filterAcc(p, new Empty)
+  def filter(p: Tweet => Boolean): TweetSet = filterAcc(p, new Empty)
 
   /**
    * This is a helper method for `filter` that propagetes the accumulated tweets.
@@ -55,7 +60,9 @@ abstract class TweetSet extends TweetSetInterface {
    * Question: Should we implment this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-  def union(that: TweetSet): TweetSet = ???
+  //  def union(that: TweetSet): TweetSet = ???
+  //  def union(that: TweetSet): TweetSet
+  def union(that: TweetSet): TweetSet = that.filterAcc(_ => true, this)
 
   /**
    * Returns the tweet from this set which has the greatest retweet count.
@@ -66,7 +73,8 @@ abstract class TweetSet extends TweetSetInterface {
    * Question: Should we implment this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-  def mostRetweeted: Tweet = ???
+  //  def mostRetweeted: Tweet = ???
+  def mostRetweeted: Tweet // must be abstract if Empty needs it's own functionality
 
   /**
    * Returns a list containing all tweets of this set, sorted by retweet count
@@ -109,6 +117,10 @@ abstract class TweetSet extends TweetSetInterface {
 
 class Empty extends TweetSet {
 
+  def isEmpty = true
+
+  def mostRetweeted: Tweet = throw new java.util.NoSuchElementException("Empty.mostRetweeted")
+
   //  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = ???
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = acc
 
@@ -123,10 +135,31 @@ class Empty extends TweetSet {
   def remove(tweet: Tweet): TweetSet = this
 
   def foreach(f: Tweet => Unit): Unit = ()
+
+//  def union(that: TweetSet): TweetSet = that
 }
 
 class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
 
+  def isEmpty: Boolean = false
+
+  //  def mostRetweeted: Tweet = ???
+  def mostRetweeted: Tweet = {
+    if (left.isEmpty && right.isEmpty) elem
+    else if (left.isEmpty) compareTweets(elem, right.mostRetweeted)
+    else if (right.isEmpty) compareTweets(elem, left.mostRetweeted)
+    else compareTweets(left.mostRetweeted, compareTweets(left.mostRetweeted, elem))
+  }
+
+  def compareTweets(leader: Tweet, currentElem: Tweet): Tweet = {
+    if (currentElem.retweets > leader.retweets) currentElem else leader
+  }
+
+
+  //  def union(that: TweetSet): TweetSet = ???
+//  def union(that: TweetSet): TweetSet = {
+//    left.union(right.union(that.incl(elem)))
+//  }
 
   // Somewhat close but could not see the solution after 5 hours :(
   // https://coderwall.com/p/_akojq/scala-week-3
