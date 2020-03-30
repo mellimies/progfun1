@@ -29,11 +29,12 @@ trait Huffman extends HuffmanInterface {
     case Fork(_, _, _, weight) => weight
   }
 
-//  def chars(tree: CodeTree): List[Char] = ??? // tree match ...
+  //  def chars(tree: CodeTree): List[Char] = ??? // tree match ...
   def chars(tree: CodeTree): List[Char] = tree match {
     case Leaf(char, _) => List(char)
     case Fork(_, _, chars, _) => chars
   }
+
   def makeCodeTree(left: CodeTree, right: CodeTree) =
     Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
 
@@ -73,7 +74,10 @@ trait Huffman extends HuffmanInterface {
    * println("integer is  : "+ theInt)
    * }
    */
-  def times(chars: List[Char]): List[(Char, Int)] = ???
+  //  def times(chars: List[Char]): List[(Char, Int)] = ???
+  def times(chars: List[Char]): List[(Char, Int)] = {
+    chars.groupBy(identity).view.mapValues(_.size).toList
+  }
 
   /**
    * Returns a list of `Leaf` nodes for a given frequency table `freqs`.
@@ -82,12 +86,14 @@ trait Huffman extends HuffmanInterface {
    * head of the list should have the smallest weight), where the weight
    * of a leaf is the frequency of the character.
    */
-  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = ???
+  //  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = ???
+  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = freqs.sortBy(t => t._2).map(t => Leaf(t._1, t._2))
 
   /**
    * Checks whether the list `trees` contains only one single code tree.
    */
-  def singleton(trees: List[CodeTree]): Boolean = ???
+  //  def singleton(trees: List[CodeTree]): Boolean = ???
+  def singleton(trees: List[CodeTree]): Boolean = if (trees.isEmpty) false else trees.tail.isEmpty
 
   /**
    * The parameter `trees` of this function is a list of code trees ordered
@@ -101,7 +107,23 @@ trait Huffman extends HuffmanInterface {
    * If `trees` is a list of less than two elements, that list should be returned
    * unchanged.
    */
-  def combine(trees: List[CodeTree]): List[CodeTree] = ???
+  //  def combine(trees: List[CodeTree]): List[CodeTree] = ???
+  def combine(trees: List[CodeTree]): List[CodeTree] =
+    if (singleton(trees)) trees
+    else {
+      val t1 = trees.head
+      val t2 = trees.tail.head
+      val remainder = trees.tail.tail
+
+      val combinedTree = Fork(t1, t2, chars(t1) ::: chars(t2), weight(t1) + weight(t2))
+
+      def insert(x: CodeTree, xs: List[CodeTree]): List[CodeTree] = xs match {
+        case Nil => List(x)
+        case y :: ys => if (weight(x) < weight(y)) x :: xs else y :: insert(x, ys)
+      }
+      insert(combinedTree, remainder)
+    }
+
 
   /**
    * This function will be called in the following way:
