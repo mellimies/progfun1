@@ -121,6 +121,7 @@ trait Huffman extends HuffmanInterface {
         case Nil => List(x)
         case y :: ys => if (weight(x) < weight(y)) x :: xs else y :: insert(x, ys)
       }
+
       insert(combinedTree, remainder)
     }
 
@@ -194,7 +195,30 @@ trait Huffman extends HuffmanInterface {
    * This function encodes `text` using the code tree `tree`
    * into a sequence of bits.
    */
-  def encode(tree: CodeTree)(text: List[Char]): List[Bit] = ???
+  //  def encode(tree: CodeTree)(text: List[Char]): List[Bit] = ???
+  def encode(tree: CodeTree)(text: List[Char]): List[Bit] = {
+    def encodeLoop(acc: List[Bit], loopTree: CodeTree, text: List[Char]): List[Bit] = {
+      if (text.isEmpty) acc
+      else
+        loopTree match {
+          case f: Fork => {
+            val newBit = if (chars(f.left).contains(text.head)) 0 else 1
+            val newTree = if (newBit == 0) f.left else f.right
+            val textFound = newTree match {
+              case _: Leaf => true
+              case _ => false
+            }
+            if (textFound) encodeLoop(newBit :: acc, tree, text.tail)
+            else encodeLoop(newBit :: acc, newTree, text)
+          }
+          case l: Leaf => throw new Error("encodeLoop should never process a Leaf! " + l)
+        }
+    }
+
+    val ans = encodeLoop(List[Bit](), tree, text).reverse
+    ans
+  }
+
 
   // Part 4b: Encoding using code table
 
