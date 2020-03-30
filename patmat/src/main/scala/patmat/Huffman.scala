@@ -109,7 +109,7 @@ trait Huffman extends HuffmanInterface {
    */
   //  def combine(trees: List[CodeTree]): List[CodeTree] = ???
   def combine(trees: List[CodeTree]): List[CodeTree] =
-    if (singleton(trees)) trees
+    if (trees.isEmpty || singleton(trees)) trees
     else {
       val t1 = trees.head
       val t2 = trees.tail.head
