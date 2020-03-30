@@ -85,7 +85,10 @@ abstract class TweetSet extends TweetSetInterface {
    * Question: Should we implment this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-  def descendingByRetweet: TweetList = ???
+//  def descendingByRetweet: TweetList = ???
+  def descendingByRetweet: TweetList
+
+//  def descendingByRetweetAcc(acc: TweetList): TweetList = ???
 
   /**
    * The following methods are already implemented
@@ -119,6 +122,8 @@ class Empty extends TweetSet {
 
   def isEmpty = true
 
+  def descendingByRetweet =  Nil
+
   def mostRetweeted: Tweet = throw new java.util.NoSuchElementException("Empty.mostRetweeted")
 
   //  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = ???
@@ -142,6 +147,8 @@ class Empty extends TweetSet {
 class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
 
   def isEmpty: Boolean = false
+
+  def descendingByRetweet: TweetList = new Cons(mostRetweeted, remove(elem).descendingByRetweet)
 
   //  def mostRetweeted: Tweet = ???
   def mostRetweeted: Tweet = {
