@@ -43,5 +43,11 @@ class HuffmanSuite {
     }
 
 
+  @Test def `decode secret`: Unit =
+    new TestTrees {
+      assertEquals("huffmanestcool".toList, decode(frenchCode, secret))
+    }
+
+
   @Rule def individualTestTimeout = new org.junit.rules.Timeout(10 * 1000)
 }

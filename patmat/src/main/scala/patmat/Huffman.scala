@@ -136,7 +136,7 @@ trait Huffman extends HuffmanInterface {
    * In such an invocation, `until` should call the two functions until the list of
    * code trees contains only one single tree, and then return that singleton list.
    */
-//  def until(done: List[CodeTree] => Boolean, merge: List[CodeTree] => List[CodeTree])(trees: List[CodeTree]): List[CodeTree] = ???
+  //  def until(done: List[CodeTree] => Boolean, merge: List[CodeTree] => List[CodeTree])(trees: List[CodeTree]): List[CodeTree] = ???
   def until(done: List[CodeTree] => Boolean, merge: List[CodeTree] => List[CodeTree])(trees: List[CodeTree]): List[CodeTree] =
     if (done(trees)) trees
     else merge(trees)
@@ -158,7 +158,15 @@ trait Huffman extends HuffmanInterface {
    * This function decodes the bit sequence `bits` using the code tree `tree` and returns
    * the resulting list of characters.
    */
-  def decode(tree: CodeTree, bits: List[Bit]): List[Char] = ???
+  //  def decode(tree: CodeTree, bits: List[Bit]): List[Char] = ???
+  def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
+    def loopBits(acc: List[Char], loopTree: CodeTree, bits: List[Bit]): List[Char] = loopTree match {
+      case l: Leaf => if (bits.isEmpty) l.char :: acc else loopBits(l.char :: acc, tree, bits) // must not tail
+      case f: Fork => if (bits.head == 0) loopBits(acc, f.left, bits.tail) else loopBits(acc, f.right, bits.tail)
+    }
+
+    loopBits(Nil, tree, bits).reverse
+  }
 
   /**
    * A Huffman coding tree for the French language.
@@ -176,7 +184,8 @@ trait Huffman extends HuffmanInterface {
   /**
    * Write a function that returns the decoded secret
    */
-  def decodedSecret: List[Char] = ???
+  //  def decodedSecret: List[Char] = ???
+  def decodedSecret: List[Char] = decode(frenchCode, secret)
 
 
   // Part 4a: Encoding using Huffman tree
