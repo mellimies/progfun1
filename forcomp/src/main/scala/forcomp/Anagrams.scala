@@ -64,7 +64,17 @@ object Anagrams extends AnagramsInterface {
    *    List(('a', 1), ('e', 1), ('t', 1)) -> Seq("ate", "eat", "tea")
    *
    */
-  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = ???
+  //  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = ???
+  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = {
+    val occDict = dictionary
+      .map(w => (w, wordOccurrences(w)))
+      .toMap.groupBy(_._2) // occ -> Map(word, occ)
+      .view.mapValues(_.keys.toList) // collect works pointing to same occ
+      .toMap // desired output type
+
+//    println("Dict: " + occDict)
+    occDict
+  }
 
   /** Returns all the anagrams of a given word. */
   def wordAnagrams(word: Word): List[Word] = ???
