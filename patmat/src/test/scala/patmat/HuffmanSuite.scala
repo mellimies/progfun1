@@ -53,6 +53,7 @@ class HuffmanSuite {
       val testText = "ture from 45 BC, making it over 2000 years old. Richard Mc"
       val tTest = createCodeTree(string2Chars(testText))
       assertEquals(testText.toList, decode(tTest, encode(tTest)(testText.toList)))
+      assertEquals(testText.toList, decode(tTest, quickEncode(tTest)(testText.toList)))
     }
 
 

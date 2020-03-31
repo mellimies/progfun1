@@ -168,9 +168,9 @@ trait Huffman extends HuffmanInterface {
   //  def decode(tree: CodeTree, bits: List[Bit]): List[Char] = ???
   def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
     def loopBits(acc: List[Char], loopTree: CodeTree, bits: List[Bit]): List[Char] = loopTree match {
-      case l: Leaf => if (bits.isEmpty) l.char :: acc else loopBits(l.char :: acc, tree, bits) // must not tail
-      case f: Fork => if (bits.head == 0) loopBits(acc, f.left, bits.tail) else loopBits(acc, f.right, bits.tail)
-    }
+        case l: Leaf => if (bits.isEmpty) l.char :: acc else loopBits(l.char :: acc, tree, bits) // must not tail
+        case f: Fork => if (bits.head == 0) loopBits(acc, f.left, bits.tail) else loopBits(acc, f.right, bits.tail)
+      }
 
     loopBits(Nil, tree, bits).reverse
   }
@@ -283,7 +283,7 @@ trait Huffman extends HuffmanInterface {
     def quickLoop(acc: List[Bit], text: List[Char]): List[Bit] = {
       text match {
         case Nil => acc
-        case t :: ts => quickLoop( bits(t) ::: acc, ts)
+        case t :: ts => quickLoop( bits(t).reverse ::: acc, ts)
       }
     }
     quickLoop(List(), text).reverse
