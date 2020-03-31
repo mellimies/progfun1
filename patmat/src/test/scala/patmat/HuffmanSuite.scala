@@ -42,11 +42,24 @@ class HuffmanSuite {
       assertEquals("ab".toList, decode(t1, encode(t1)("ab".toList)))
     }
 
+  @Test def `decode and encode identity from grader`: Unit =
+    new TestTrees {
+      val testText = "ture from 45 BC, making it over 2000 years old. Richard Mc"
+      assertEquals(testText.toList, decode(frenchCode, encode(frenchCode)(testText.toList)))
+    }
+
 
   @Test def `decode secret`: Unit =
     new TestTrees {
       assertEquals("huffmanestcool".toList, decode(frenchCode, secret))
     }
+
+  @Test def `convert test for development`: Unit =
+    new TestTrees {
+      assertEquals(List(('a',List(0)), ('b',List(1))), convert(t1))
+//      assertEquals(List(('a',List(0)), ('b',List(1))), convert(frenchCode))
+    }
+
 
 
   @Rule def individualTestTimeout = new org.junit.rules.Timeout(10 * 1000)
