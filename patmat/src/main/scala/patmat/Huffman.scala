@@ -118,7 +118,7 @@ trait Huffman extends HuffmanInterface {
       val combinedTree = Fork(t1, t2, chars(t1) ::: chars(t2), weight(t1) + weight(t2))
 
       def insert(x: CodeTree, xs: List[CodeTree]): List[CodeTree] = xs match {
-        case Nil => List(x)
+          case Nil => List(x)
         case y :: ys => if (weight(x) < weight(y)) x :: xs else y :: insert(x, ys)
       }
 
@@ -138,9 +138,15 @@ trait Huffman extends HuffmanInterface {
    * code trees contains only one single tree, and then return that singleton list.
    */
   //  def until(done: List[CodeTree] => Boolean, merge: List[CodeTree] => List[CodeTree])(trees: List[CodeTree]): List[CodeTree] = ???
-  def until(done: List[CodeTree] => Boolean, merge: List[CodeTree] => List[CodeTree])(trees: List[CodeTree]): List[CodeTree] =
-    if (done(trees)) trees
-    else merge(trees)
+  def until(done: List[CodeTree] => Boolean, merge: List[CodeTree] => List[CodeTree])(trees: List[CodeTree]): List[CodeTree] = {
+
+    def untilLoop(loopTrees: List[CodeTree]): List[CodeTree] =
+    {
+      if (done(loopTrees)) loopTrees
+      else untilLoop(merge(loopTrees))
+    }
+    untilLoop(trees)
+  }
 
   /**
    * This function creates a code tree which is optimal to encode the text `chars`.
@@ -211,7 +217,7 @@ trait Huffman extends HuffmanInterface {
             if (textFound) encodeLoop(newBit :: acc, tree, text.tail)
             else encodeLoop(newBit :: acc, newTree, text)
           }
-          case l: Leaf => throw new Error("encodeLoop should never process a Leaf! " + l) // TODO: fix test case
+          case l: Leaf => throw new Error("encodeLoop should never process a Leaf! " + l)
         }
     }
 
