@@ -103,7 +103,17 @@ object Anagrams extends AnagramsInterface {
    *  Note: the resulting value is an occurrence - meaning it is sorted
    *  and has no zero-entries.
    */
-  def subtract(x: Occurrences, y: Occurrences): Occurrences = ???
+    //  def subtract(x: Occurrences, y: Occurrences): Occurrences = ???
+    def subtract(x: Occurrences, y: Occurrences): Occurrences = {
+      val step1 = (x ++ y).groupBy(_._1).toList
+      val ans = step1.map(elem => elem match {
+        case (key, List(v)) => (key, v._2)
+        case (key, List(e1, e2)) => (key, e1._2 - e2._2)
+      })
+        .filter(p => p._2 > 0)
+      ans.sorted
+
+    }
 
   /** Returns a list of all anagram sentences of the given sentence.
    *
