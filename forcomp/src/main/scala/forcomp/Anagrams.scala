@@ -122,15 +122,15 @@ object Anagrams extends AnagramsInterface {
       acc + List(elem) ++ mapAccumulator(elem, acc)
     }
 
+    @scala.annotation.tailrec
     def loop(occurrences: Occurrences, acc: Set[Occurrences]): List[Occurrences] = {
       //      println(s"OCS $occurrences ACC ${acc.toList.mkString("\n")}")
       occurrences match {
         case Nil => acc.toList
-        case o :: os => {
+        case o :: os =>
           val (char, count) = o
           if (count > 1) loop((char, count - 1) :: os, newAccumulator(o, acc))
           else loop(os, newAccumulator(o, acc))
-        }
       }
     }
     loop(occurrences, Set(List()))
@@ -150,10 +150,10 @@ object Anagrams extends AnagramsInterface {
   //  def subtract(x: Occurrences, y: Occurrences): Occurrences = ???
   def subtract(x: Occurrences, y: Occurrences): Occurrences = {
     val step1 = (x ++ y).groupBy(_._1).toList
-    val ans = step1.map(elem => elem match {
+    val ans = step1.map {
       case (key, List(v)) => (key, v._2)
       case (key, List(e1, e2)) => (key, e1._2 - e2._2)
-    })
+    }
       .filter(p => p._2 > 0)
     ans.sorted
 
