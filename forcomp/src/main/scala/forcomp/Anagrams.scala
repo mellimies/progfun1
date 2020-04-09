@@ -79,7 +79,7 @@ object Anagrams extends AnagramsInterface {
 
   /** Returns all the anagrams of a given word. */
   //  def wordAnagrams(word: Word): List[Word] = ???
-  def wordAnagrams(word: Word): List[Word] = dictionaryByOccurrences(wordOccurrences(word))
+  def wordAnagrams(word: Word): List[Word] = dictionaryByOccurrences(wordOccurrences(word)).filter(!_.isEmpty)
 
   /** Returns the list of all subsets of the occurrence list.
    * This includes the occurrence itself, i.e. `List(('k', 1), ('o', 1))`
@@ -123,7 +123,7 @@ object Anagrams extends AnagramsInterface {
     }
 
     def loop(occurrences: Occurrences, acc: Set[Occurrences]): List[Occurrences] = {
-//      println(s"OCS $occurrences ACC ${acc.toList.mkString("\n")}")
+      //      println(s"OCS $occurrences ACC ${acc.toList.mkString("\n")}")
       occurrences match {
         case Nil => acc.toList
         case o :: os => {
@@ -199,8 +199,51 @@ object Anagrams extends AnagramsInterface {
    *
    * Note: There is only one anagram of an empty sentence.
    */
-  def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
+
+    /**
+     * My unoptimized implementation for sentenceAnagrams:
+     * 0: check for special case of empty sentence
+     * 1: get the full list of words from combinations (contains word anagrams, therefore unoptimized)
+     * 2: subtract sentenceOccurrences(List(word)) from original occurrences, if we have characters left then
+     * 3: get all words from characters left (occs -> combs -> map(dict...)
+     * 4: for each word left repeat loop except that word list is now List(newWord, word)
+     * 5: terminate when:
+     *    a: list of word matches occurrences -> anagram
+     *    b: we have no more new words from characters that are still left (not anagram)
+     * 6: return flatMapped value for each word into loop -> all tests pass, grade 10/10.
+     *
+     * Implementation is compact but has taken almost two weeks, a lot of attempts to get the algorithm
+     * on paper, excel etc. Coursera estimate of 3 hours is closer to 30 but very happy I did not give
+     * up and was able to get the solution. It's not exactly what's in the guide but works.
+     *
+     * It could still be optimized by taking only a single word from dictionary values, any list
+     * returned contains word anagrams so occurrences is the same for each word in list. Actually initially
+     * tried to use that but then the result would need to be processed for each word and expanded
+     * to word anagrams, maybe later, moving this mountain is enough for now.
+
+     */
+  //  def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
+  def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
+
+    if (sentence.isEmpty) List(sentence) else {
+
+      def realWords(combs: List[Occurrences]): List[Word] = combs.flatMap(dictionaryByOccurrences).filterNot(_.isEmpty)
+
+      val occs = sentenceOccurrences(sentence)
+
+      def loop(anagramCandidateList: Sentence, acc: Set[Sentence]): Set[Sentence] = {
+        val newOccs = subtract(occs, sentenceOccurrences(anagramCandidateList))
+        //        println(s"Candidates: $anagramCandidateList, occs left: $newOccs")
+        if (newOccs == Nil) acc + anagramCandidateList // anagram :)
+        else // still occs left or not anagram
+        realWords(combinations(newOccs)).flatMap(w => loop(w :: anagramCandidateList, acc)).toSet
+      }
+
+      realWords(combinations(occs)).flatMap(w => loop(List(w), Set.empty))
+    }
+
   }
+}
 
   object Dictionary {
     def loadDictionary: List[String] = {
@@ -220,4 +263,4 @@ object Anagrams extends AnagramsInterface {
         wordstream.close()
       }
     }
-}
+  }
